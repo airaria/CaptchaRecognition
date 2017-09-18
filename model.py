@@ -67,7 +67,7 @@ class Encoder(nn.Module):
             return (h0.cuda())
         else:
             return h0
-
+'''
 class RNNDecoder(nn.Module):
     def __init__(self, input_vocab_size, hidden_size, output_size,
                  num_rnn_layers=1, dropout=0.):
@@ -93,7 +93,7 @@ class RNNDecoder(nn.Module):
         output,hidden = self.gru(embed_input,hidden)
         output  = self.out(output.squeeze())
         return output, hidden
-
+'''
 class Attn(nn.Module):
     def __init__(self,method,hidden_size):
         super(Attn,self).__init__()

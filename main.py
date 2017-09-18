@@ -15,9 +15,9 @@ if __name__ == '__main__':
     NUM_EPOCHS = 50
     PRINT_EVERY_N_ITER = 100
     ATTN_TYPE='dot'
-    ATTN_CLASS='simple' #complex|simple
+    ATTN_CLASS='type1' #type1 (Luong) | type2
     ENC_TYPE='CNNRNN' #CNN|CNNRNN
-    SAVE_DIR ='CNNRNNdot128_lr0.0003cp10simple'
+    SAVE_DIR ='CNNRNNdot128_lr0.0003cp10type1'
     if not os.path.exists(SAVE_DIR):
         os.mkdir(SAVE_DIR)
 
@@ -31,11 +31,11 @@ if __name__ == '__main__':
                             rnn_hidden_size=HIDDEN_SIZE,
                             dropout=DROPOUT)
 
-    if ATTN_CLASS=='simple':
+    if ATTN_CLASS=='type1':
         decoder = RNNAttnDecoder(ATTN_TYPE,input_vocab_size=VOCAB_SIZE,hidden_size=HIDDEN_SIZE,
                                  output_size=VOCAB_SIZE,num_rnn_layers=NUM_RNN_LAYERS,
                                  dropout=DROPOUT)
-    elif ATTN_CLASS=='complex':
+    elif ATTN_CLASS=='type2':
         decoder = RNNAttnDecoder2(ATTN_TYPE,input_vocab_size=VOCAB_SIZE,hidden_size=HIDDEN_SIZE,
                                   output_size=VOCAB_SIZE,num_rnn_layers=NUM_RNN_LAYERS,
                                   dropout=DROPOUT)
