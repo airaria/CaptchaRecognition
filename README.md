@@ -8,7 +8,9 @@ End-to-end variable length Captcha recognition using  CNN+RNN+Attention.  端到
 
 ## Usage
 把字体文件放入fonts文件夹，并修改GenCaptcha.py中第173行的字体文件名。
+
 运行 python GenCaptcha.py ，在data/下生成数据集captcha.npz和captcha.vocab_dict。
-GenCaptcha.py中还提供了生成tfrecord文件的函数。
+
+（GenCaptcha.py中还提供了生成tfrecord文件的函数。）
 
 运行 python main.py训练。
