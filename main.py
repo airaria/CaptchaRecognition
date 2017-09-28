@@ -18,6 +18,9 @@ if __name__ == '__main__':
     ATTN_CLASS='type1' #type1 (Luong) | type2
     ENC_TYPE='CNNRNN' #CNN|CNNRNN
     SAVE_DIR ='CNNRNNdot128_lr0.0003cp10type1'
+    if not os.path.exists("results"):
+        os.mkdir("results")
+    SAVE_DIR=os.path.join("results",SAVE_DIR)
     if not os.path.exists(SAVE_DIR):
         os.mkdir(SAVE_DIR)
 
