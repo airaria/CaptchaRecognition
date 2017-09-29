@@ -46,20 +46,23 @@ def gen_captcha(charset,nb_chars=None,font=None):
 
 def convert_to_npz(num,captcha_generator,is_encoded,is_with_tags):
 
-    extra_symbol = []
+    vocab = charset[:]
+    if is_encoded:
+        vocab += [' ']
     if is_with_tags:
-        extra_symbol += [['^','$']]
-    if is_encoded: #padding with space
-        extra_symbol += [[" "]]
-    vocab = set(chain.from_iterable(charset+extra_symbol))
+        id2token = {k+1:v for k,v in enumerate(vocab)}
+        id2token[0] = '^'
+        id2token[len(vocab)+1]='$'
+    else:
+        id2token = dict(enumerate(vocab))
 
-    id2token = dict(enumerate(vocab))
     token2id = {v:k for k,v in id2token.items()}
+
     vocab_dict ={"id2token":id2token,"token2id":token2id}
     with open("data/captcha.vocab_dict","wb") as dict_file:
         pickle.dump(vocab_dict,dict_file)
-
     fn = "data/captcha.npz"
+
     print("Writing ",fn)
     img_buffer = np.zeros((num,TARGET_HEIGHT,TARGET_WIDTH,3),dtype=np.uint8)
     text_buffer = []
@@ -76,19 +79,20 @@ def convert_to_npz(num,captcha_generator,is_encoded,is_with_tags):
     return vocab_dict,img_buffer,text_buffer
 
 def convert_to_tfrecord(num,captcha_generator,is_encoded,is_with_tags):
-    extra_symbol = []
+    vocab = charset
+    if is_encoded:
+        vocab += [" "]
     if is_with_tags:
-        extra_symbol += [['^','$']]
-    if is_encoded: #padding with space
-        extra_symbol += [[" "]]
-    vocab = set(chain.from_iterable(charset+extra_symbol))
+        id2token = {k+1:v for k,v in enumerate(vocab)}
+        id2token[0] = '^'
+        id2token[len(vocab)]='$'
+    else:
+        id2token=dict(enumerate(vocab))
 
-    id2token = dict(enumerate(vocab))
-    token2id = {v: k for k, v in id2token.items()}
-    vocab_dict = {"id2token": id2token, "token2id": token2id}
-    with open("data/captcha.vocab_dict", "wb") as dict_file:
-        pickle.dump(vocab_dict, dict_file)
-
+    token2id = {v:k for k,v in id2token.items()}
+    vocab_dict ={"id2token":id2token,"token2id":token2id}
+    with open("data/captcha.vocab_dict","wb") as dict_file:
+        pickle.dump(vocab_dict,dict_file)
     fn = "data/captcha.tfrecords"
     print('Writing ',fn)
     writer = tf.python_io.TFRecordWriter(fn)
@@ -171,10 +175,10 @@ def read_tfrecord(fn,num_epochs,is_encoded):
 
 if __name__ == '__main__':
     captcha_generator = gen_captcha(charset,font='fonts/YaHeiConsolas.ttf')
-    x,y = next(captcha_generator)
-    plt.imshow(x)
-    plt.show()
-    print(y)
+    #x,y = next(captcha_generator)
+    #plt.imshow(x)
+    #plt.show()
+    #print(y)
     vocab_dict,img,text = convert_to_npz(num=65536,captcha_generator=captcha_generator,
                    is_encoded=True,is_with_tags=True)
     #vocab_dict = convert_to_tfrecord(65536,captcha_generator,is_encoded=False,is_with_tags=True)

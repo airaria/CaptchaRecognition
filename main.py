@@ -160,22 +160,3 @@ if __name__ == '__main__':
     print ("Another fig is saved.")
     #plt.show()
     np.savetxt(os.path.join(SAVE_DIR,"acc.txt"),np.vstack([epoch_train_accuracy,test_accuracy,epoch_train_accclevel,test_accclevel]).T)
-    '''
-    #test data flow
-    x,y = next(train_iter)
-    vx = Variable(x)
-    vy = Variable(y)
-    initHidden = encoder.initHidden(BATCH_SIZE)
-
-
-    loss = train(vx, vy, encoder, decoder,encoder_optimizer, decoder_optimizer,
-              criterion, clip=CLIP)
-
-    encoder_outputs,encoder_hidden = encoder(vx,initHidden)
-
-    last_ht = Variable(torch.zeros(BATCH_SIZE, decoder.hidden_size))
-    decoder_output, ht, hidden, alpha= decoder(input=vy[:,0].long(),
-                                            last_ht = last_ht,
-                                            last_hidden = encoder_hidden,
-                                            encoder_outputs = encoder_outputs)
-    '''
