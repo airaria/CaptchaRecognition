@@ -1,6 +1,7 @@
 import torch
 from torch.nn import functional
 from torch.autograd import Variable
+import numpy as np
 
 def sequence_mask(sequence_length, max_len=None):
     if max_len is None:
@@ -48,3 +49,11 @@ def masked_cross_entropy(logits, target, length):
     losses = losses * mask.float()
     loss = losses.sum() / length.float().sum()
     return loss
+
+def decode_ctc_outputs(ctc_outputs,blank=0):
+    outputs = ctc_outputs.max(dim=-1)[1].data.numpy()
+    seq_len = outputs.shape[1]
+    imres = [np.array([sample[i] for i in range(seq_len-1)
+                       if sample[i]!=sample[i-1]]+[sample[-1]],dtype=np.int32)
+                for  sample in outputs]
+    return [sample[sample!=blank] for sample in imres]
