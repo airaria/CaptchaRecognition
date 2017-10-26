@@ -19,20 +19,20 @@ class CTCModel(nn.Module):
             nn.Dropout2d(dropout)
         )
         self.layer2 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=(4, 3), stride=(4, 2)),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(32, 32, kernel_size=(4, 3), stride=(4, 2)),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.Dropout2d(dropout)
         )
         self.layer3 = nn.Sequential(
-            nn.Conv2d(64, 128, kernel_size=(4, 2), stride=(1, 1)),
-            nn.BatchNorm2d(128),
+            nn.Conv2d(32, 64, kernel_size=(4, 2), stride=(1, 1)),
+            nn.BatchNorm2d(64),
             nn.ReLU()
         )
-        self.gru = nn.GRU(128, rnn_hidden_size, num_rnn_layers,
+        self.gru = nn.GRU(64, rnn_hidden_size, num_rnn_layers,
                           batch_first=True,
-                          dropout=dropout)
-        self.linear = nn.Linear(rnn_hidden_size,output_size)
+                          dropout=dropout,bidirectional=True)
+        self.linear = nn.Linear(rnn_hidden_size*2,output_size)
 
     def forward(self, x, hidden):
         h0 = hidden
@@ -45,13 +45,15 @@ class CTCModel(nn.Module):
         return out
 
     def initHidden(self,batch_size,use_cuda=False):
-        h0 = Variable(torch.zeros(self.num_rnn_layers,batch_size,self.rnn_hidden_size))
+        h0 = Variable(torch.zeros(self.num_rnn_layers*2,batch_size,self.rnn_hidden_size))
         if use_cuda:
             return (h0.cuda())
         else:
             return h0
 
 def CTCtrain(inputs,targets,lens,ctc,ctc_optimizer,criterion,clip,use_cuda=False):
+    if use_cuda:
+        inputs = inputs.cuda()
     loss = 0
     ctc_optimizer.zero_grad()
     batch_size = inputs.size()[0]
@@ -74,10 +76,11 @@ def CTCtrain(inputs,targets,lens,ctc,ctc_optimizer,criterion,clip,use_cuda=False
     accuracy = np.array([np.array_equal(decoded_targets[i],decoded_outputs[i])
                          for i in range(batch_size)]).mean()
 
-
     return loss.data[0],accuracy
 
 def CTCevaluate(inputs,targets,lens,ctc,criterion,clip,use_cuda=False):
+    if use_cuda:
+        inputs = inputs.cuda()
     ctc.train(False)
     loss = 0
     batch_size = inputs.size()[0]

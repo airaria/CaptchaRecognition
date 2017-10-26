@@ -2,6 +2,8 @@ from data_utils_torch import *
 from ctcmodel import *
 from warpctc_pytorch import CTCLoss
 import os
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
@@ -9,20 +11,20 @@ if __name__ == '__main__':
     HEIGHT = 48
     WIDTH = 128
     HIDDEN_SIZE = 128
-    NUM_RNN_LAYERS = 2
-    DROPOUT = 0
+    NUM_RNN_LAYERS = 1
+    DROPOUT = 0.3
     LR = 0.0003
-    CLIP = 10.
-    NUM_EPOCHS = 50
-    PRINT_EVERY_N_ITER = 10
+    CLIP = 20.
+    NUM_EPOCHS = 100
+    PRINT_EVERY_N_ITER = 100
     SAVE_DIR = 'CTC128_lr0.0003cp10'
     if not os.path.exists("results"):
         os.mkdir("results")
     SAVE_DIR = os.path.join("results", SAVE_DIR)
     if not os.path.exists(SAVE_DIR):
         os.mkdir(SAVE_DIR)
-    TOTAL_SIZE = 16384
-    TEST_SIZE = 512
+    TOTAL_SIZE = None
+    TEST_SIZE = 8192
 
     USE_CUDA = torch.cuda.is_available()
 
@@ -58,10 +60,7 @@ if __name__ == '__main__':
             vy = Variable(y[y<END-1].contiguous())
             lens = Variable(torch.from_numpy(
                 (np.where(y.numpy()==END)[1]).astype(np.int32)))
-            if USE_CUDA:
-                vx = vx.cuda()
-                vy = vy.cuda()
-                lens = lens.cuda()
+
             a_loss, a_accuracy = CTCtrain(vx,vy,lens,ctc, ctc_optimizer,
                                     criterion, CLIP, use_cuda=USE_CUDA)
             loss += a_loss
@@ -93,10 +92,7 @@ if __name__ == '__main__':
             vy = Variable(y[y<END-1].contiguous())
             lens = Variable(torch.from_numpy(
                 (np.where(y.numpy()==END)[1]).astype(np.int32)))
-            if USE_CUDA:
-                vx = vx.cuda()
-                vy = vy.cuda()
-                lens = lens.cuda()
+
             a_loss, a_accuracy, outputs = CTCevaluate(vx, vy, lens,ctc, criterion,CLIP,
                                                     use_cuda=USE_CUDA)
             loss += a_loss

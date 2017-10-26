@@ -51,7 +51,7 @@ def masked_cross_entropy(logits, target, length):
     return loss
 
 def decode_ctc_outputs(ctc_outputs,blank=0):
-    outputs = ctc_outputs.max(dim=-1)[1].data.numpy()
+    outputs = ctc_outputs.max(dim=-1)[1].cpu().data.numpy()
     seq_len = outputs.shape[1]
     imres = [np.array([sample[i] for i in range(seq_len-1)
                        if sample[i]!=sample[i-1]]+[sample[-1]],dtype=np.int32)
