@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     BATCH_SIZE = 64
-    TEST_SIZE = 8192
     HEIGHT = 48
     WIDTH = 128
     HIDDEN_SIZE = 128
@@ -15,17 +14,19 @@ if __name__ == '__main__':
     LR = 0.0003
     CLIP = 10.
     NUM_EPOCHS = 50
-    PRINT_EVERY_N_ITER = 100
+    PRINT_EVERY_N_ITER = 10
     SAVE_DIR = 'CTC128_lr0.0003cp10'
     if not os.path.exists("results"):
         os.mkdir("results")
     SAVE_DIR = os.path.join("results", SAVE_DIR)
     if not os.path.exists(SAVE_DIR):
         os.mkdir(SAVE_DIR)
+    TOTAL_SIZE = 16384
+    TEST_SIZE = 512
 
     USE_CUDA = torch.cuda.is_available()
 
-    dl_train, dl_test, vocab = load_dataset(batch_size=BATCH_SIZE, test_size=TEST_SIZE)
+    dl_train, dl_test, vocab = load_dataset(batch_size=BATCH_SIZE, test_size=TEST_SIZE,total_size=TOTAL_SIZE)
 
     END = vocab['token2id']['$']
     VOCAB_SIZE = len(vocab['token2id'])-2 #exclude "$" and " ", and use "^" as <BLANK>
@@ -107,7 +108,7 @@ if __name__ == '__main__':
 
         c = np.random.choice(BATCH_SIZE)
         print(''.join(vocab['id2token'][i] for i in outputs[c]) + '|' + ''.join(
-            vocab['id2token'][i] for i in y[c][1:]) + '|')
+            vocab['id2token'][i] for i in y[c]) + '|')
 
 
     print("Training over")
