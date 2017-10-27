@@ -8,7 +8,7 @@ decoder: two types of attention +no attention
 目前encoder端可以选择使用CNN+RNN或CNN；decoder端有两种attention方式+不使用attention。
 
 
-## update
+## update(2017-10-27)
 - RNN+CTC added.  新增了 CNN+RNN + CTC 的验证码识别。
 
 ## Usage
