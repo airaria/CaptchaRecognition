@@ -12,9 +12,9 @@ if __name__ == '__main__':
     WIDTH = 128
     HIDDEN_SIZE = 128
     NUM_RNN_LAYERS = 1
-    DROPOUT = 0.3
+    DROPOUT = 0.2
     LR = 0.0003
-    CLIP = 20.
+    CLIP = 10.
     NUM_EPOCHS = 100
     PRINT_EVERY_N_ITER = 100
     SAVE_DIR = 'CTC128_lr0.0003cp10'

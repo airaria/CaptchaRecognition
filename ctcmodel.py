@@ -6,6 +6,25 @@ from torch import optim
 import numpy as np
 from utils import  decode_ctc_outputs
 
+class ResBlock(nn.Module):
+    def __init__(self,in_c,out_c,stride=1):
+        super(ResBlock, self).__init__()
+        self.conv1 = nn.Conv2d(in_c,out_c,kernel_size=3,stride=stride,padding=1,bias=False)
+        self.bn1 = nn.BatchNorm2d(out_c)
+        self.relu = nn.ReLU(inplace=True)
+        self.downsample = nn.Conv2d(in_c,out_c,kernel_size=1,stride=1,bias=False)
+        self.in_c = in_c
+        self.out_c = out_c
+    def forward(self,x):
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+        if self.in_c!=self.out_c:
+            return out + self.downsample(x)
+        else:
+            return out+x
+
+
 class CTCModel(nn.Module):
     def __init__(self,output_size,rnn_hidden_size=128, num_rnn_layers=1, dropout=0):
         super(CTCModel, self).__init__()
@@ -13,23 +32,32 @@ class CTCModel(nn.Module):
         self.rnn_hidden_size = rnn_hidden_size
         self.output_size = output_size
         self.layer1 = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=(3, 4), stride=(3, 2)),
+            #ResBlock(3,32),
+            nn.Conv2d(3,32, kernel_size=(3,3),stride=(1,1),padding=(1,1)),
+            nn.ReLU(),
+            nn.Conv2d(32, 32, kernel_size=(3, 4), stride=(3, 2)),
             nn.BatchNorm2d(32),
             nn.ReLU(),
-            nn.Dropout2d(dropout)
+            #nn.Dropout2d(dropout)
         )
         self.layer2 = nn.Sequential(
+            #ResBlock(32,32),
+            nn.Conv2d(32,32, kernel_size=(3,3),stride=(1,1),padding=(1,1)),
+            nn.ReLU(),
             nn.Conv2d(32, 32, kernel_size=(4, 3), stride=(4, 2)),
             nn.BatchNorm2d(32),
             nn.ReLU(),
-            nn.Dropout2d(dropout)
+            #nn.Dropout2d(dropout)
         )
         self.layer3 = nn.Sequential(
-            nn.Conv2d(32, 64, kernel_size=(4, 2), stride=(1, 1)),
-            nn.BatchNorm2d(64),
+            #ResBlock(32,32),
+            nn.Conv2d(32, 32, kernel_size=(3, 3),stride=(1,1),padding=(1,1)),
+            nn.ReLU(),
+            nn.Conv2d(32, 32, kernel_size=(4, 2), stride=(1, 1)),
+            nn.BatchNorm2d(32),
             nn.ReLU()
         )
-        self.gru = nn.GRU(64, rnn_hidden_size, num_rnn_layers,
+        self.gru = nn.GRU(32, rnn_hidden_size, num_rnn_layers,
                           batch_first=True,
                           dropout=dropout,bidirectional=True)
         self.linear = nn.Linear(rnn_hidden_size*2,output_size)
