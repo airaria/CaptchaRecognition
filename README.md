@@ -35,4 +35,5 @@ Install [warp_ctc for pytorch](https://github.com/SeanNaren/warp-ctc/tree/pytorc
 按照上一节的步骤生成数据后，运行 python ctcmain.py.
 
 ## Results
-
+results of using CTC:
+![](./images/epoch_error.png)
