@@ -35,6 +35,6 @@ Install [warp_ctc for pytorch](https://github.com/SeanNaren/warp-ctc/tree/pytorc
 按照上一节的步骤生成数据后，运行 python ctcmain.py.
 
 ## Results
-results of using CTC, accuracy reaches 0.95 on test set：
+results of using CTC (accuracy reaches 0.95 on test set)：
 ![](./images/epoch_error.png)
 
